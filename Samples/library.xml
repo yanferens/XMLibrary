@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Кафедральна бібліотека: книги та їхні читачі. -->
+<library>
+  <book id="b1" faculty="ФКНК" department="Кафедра програмних систем і технологій" kind="Підручник" year="2021" language="uk">
+    <title>Основи XML і XSLT</title>
+    <author>Іваненко Олена Петрівна</author>
+    <annotation>Структура XML-документів, простори імен, XPath і перетворення XSLT з прикладами на C#.</annotation>
+    <readers>
+      <reader name="Коваленко Андрій" faculty="ФКНК" position="студент"/>
+      <reader name="Мельник Ірина" faculty="ФКНК" position="аспірант"/>
+    </readers>
+  </book>
+  <book id="b2" faculty="ФКНК" department="Кафедра теорії та технології програмування" kind="Монографія" year="2019">
+    <title>Формальні мови та граматики</title>
+    <author>Петренко Максим Васильович</author>
+    <annotation>Регулярні та контекстно-вільні мови, автомати, синтаксичний аналіз.</annotation>
+    <readers>
+      <reader name="Шевчук Олег" faculty="ФКНК" position="викладач"/>
+    </readers>
+  </book>
+  <book id="b3" faculty="Механіко-математичний" department="Кафедра алгебри та комп'ютерної математики" kind="Посібник" year="2021" language="uk" pages="212">
+    <title>Лінійна алгебра для програмістів</title>
+    <author>Бондаренко Світлана Ігорівна</author>
+    <annotation>Матриці, вектори та лінійні перетворення з прикладами коду.</annotation>
+    <readers/>
+  </book>
+  <book id="b4" faculty="Фізичний" kind="Підручник" year="2018">
+    <title>Механіка і термодинаміка</title>
+    <author>Ткаченко Василь Миколайович</author>
+    <annotation>Класична механіка, закони збереження, основи термодинаміки.</annotation>
+    <readers>
+      <reader name="Литвин Марія" faculty="Фізичний" position="студент"/>
+    </readers>
+  </book>
+  <book id="b5" faculty="ФКНК" department="Кафедра програмних систем і технологій" kind="Посібник" year="2023" language="en">
+    <title>Design Patterns in C#</title>
+    <author>Smith John</author>
+    <annotation>Strategy, Factory Method, Singleton and other patterns with XML examples.</annotation>
+    <readers>
+      <reader name="Коваленко Андрій" faculty="ФКНК" position="студент"/>
+      <reader name="Гнатюк Павло" faculty="ФКНК" position="студент"/>
+      <reader name="Шевчук Олег" faculty="ФКНК" position="викладач"/>
+    </readers>
+  </book>
+  <book id="b6" faculty="Механіко-математичний" department="Кафедра алгебри та комп'ютерної математики" kind="Підручник" year="2020">
+    <title>Дискретна математика</title>
+    <author>Бондаренко Світлана Ігорівна</author>
+    <annotation>Множини, відношення, графи, комбінаторика.</annotation>
+    <readers>
+      <reader name="Гнатюк Павло" faculty="ФКНК" position="студент"/>
+    </readers>
+  </book>
+  <book id="b7" faculty="ФКНК" department="Кафедра теорії та технології програмування" kind="Посібник" year="2022" pages="156">
+    <title>Об'єктно-орієнтоване програмування на C#</title>
+    <author>Іваненко Олена Петрівна</author>
+    <annotation>Класи, інтерфейси, наслідування; робота з файлами XML.</annotation>
+    <readers/>
+  </book>
+  <book id="b8" faculty="Фізичний" department="Кафедра теоретичної фізики" kind="Монографія" year="2021" language="en">
+    <title>Quantum Computing Basics</title>
+    <author>Ткаченко Василь Миколайович</author>
+    <annotation>Qubits, quantum gates and simple algorithms.</annotation>
+    <readers>
+      <reader name="Мельник Ірина" faculty="ФКНК" position="аспірант"/>
+    </readers>
+  </book>
+</library>
