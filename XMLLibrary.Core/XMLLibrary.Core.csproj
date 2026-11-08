@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The logic of the program: XML reading, searching, XSLT, saving and the event log.
+       It knows nothing about MAUI, so it can be tested and reused without a user interface. -->
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- Builds the /// comments into XMLLibrary.Core.xml, so IntelliSense shows them. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>
