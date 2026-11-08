@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    The main window. It only describes the look and binds to MainViewModel: every button is bound to a
+    command of the view model, so there is no search, XML or Drive code behind the buttons.
+    Layout: a left panel with the sources, the main area with the search form and the result cards,
+    and three overlays (Drive file list, HTML preview, event log) drawn above everything when needed.
+-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:XMLLibrary.ViewModels"
+             x:Class="XMLLibrary.MainPage"
+             x:DataType="vm:MainViewModel"
+             BackgroundColor="{StaticResource Background}">
+
+    <Grid ColumnDefinitions="300,*">
+
+        <!-- ═════════════ Left panel: brand, sources, Google Drive, log, exit ═════════════ -->
+        <Border Grid.Column="0"
+                BackgroundColor="{StaticResource SidebarBackground}"
+                StrokeThickness="0"
+                Padding="22,24">
+            <Grid RowDefinitions="Auto,*,Auto" RowSpacing="20">
+
+                <!-- Brand -->
+                <HorizontalStackLayout Grid.Row="0" Spacing="12">
+                    <Border WidthRequest="46" HeightRequest="46" StrokeThickness="0" StrokeShape="RoundRectangle 13">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="{StaticResource Accent}" Offset="0" />
+                                <GradientStop Color="{StaticResource AccentDeep}" Offset="1" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Label Text="&lt;/&gt;"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource OnAccent}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="0">
+                        <Label Text="XMLLibrary" FontSize="21" FontAttributes="Bold" />
+                        <Label Text="Кафедральна бібліотека" Style="{StaticResource MutedText}" FontSize="12" />
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+
+                <ScrollView Grid.Row="1">
+                    <VerticalStackLayout Spacing="12" Padding="0,4,0,0">
+
+                        <Label Text="ДЖЕРЕЛА ДАНИХ" Style="{StaticResource SectionCaption}" />
+
+                        <!-- XML document -->
+                        <Border Style="{StaticResource SourceCard}">
+                            <VerticalStackLayout Spacing="12">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                    <Border Style="{StaticResource Badge}" BackgroundColor="{StaticResource AccentSoft}" VerticalOptions="Start">
+                                        <Label Text="XML" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource Accent}" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                        <Label Text="{Binding DocumentTitle}" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                                        <Label Text="{Binding DocumentDetails}" Style="{StaticResource MutedText}" FontSize="12" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                    <Button Grid.Column="0" Text="З диска" Style="{StaticResource SoftButton}" Command="{Binding OpenXmlCommand}" />
+                                    <Button Grid.Column="1" Text="З Drive" Style="{StaticResource SoftButton}" Command="{Binding OpenXmlFromDriveCommand}" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- XSL stylesheet -->
+                        <Border Style="{StaticResource SourceCard}">
+                            <VerticalStackLayout Spacing="12">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                    <Border Style="{StaticResource Badge}" BackgroundColor="{StaticResource VioletSoft}" VerticalOptions="Start">
+                                        <Label Text="XSL" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource Violet}" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                        <Label Text="{Binding StylesheetTitle}" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                                        <Label Text="{Binding StylesheetDetails}" Style="{StaticResource MutedText}" FontSize="12" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                    <Button Grid.Column="0" Text="З диска" Style="{StaticResource SoftButton}" Command="{Binding OpenXslCommand}" />
+                                    <Button Grid.Column="1" Text="З Drive" Style="{StaticResource SoftButton}" Command="{Binding OpenXslFromDriveCommand}" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Label Text="GOOGLE DRIVE" Style="{StaticResource SectionCaption}" Margin="0,8,0,0" />
+
+                        <!-- Account state: a grey dot when signed out, a green one when signed in -->
+                        <Border Style="{StaticResource SourceCard}">
+                            <VerticalStackLayout Spacing="12">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                    <BoxView WidthRequest="9"
+                                             HeightRequest="9"
+                                             CornerRadius="5"
+                                             Color="{StaticResource TextFaint}"
+                                             VerticalOptions="Center">
+                                        <BoxView.Triggers>
+                                            <DataTrigger TargetType="BoxView" Binding="{Binding IsSignedIn}" Value="True">
+                                                <Setter Property="Color" Value="{StaticResource Mint}" />
+                                            </DataTrigger>
+                                        </BoxView.Triggers>
+                                    </BoxView>
+                                    <Label Grid.Column="1" Text="{Binding DriveStatusText}" FontSize="13" />
+                                </Grid>
+                                <Button Text="Вийти з Google акаунта"
+                                        Style="{StaticResource GhostButton}"
+                                        Command="{Binding SignOutCommand}"
+                                        IsVisible="{Binding IsSignedIn}" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Label Text="ІНСТРУМЕНТИ" Style="{StaticResource SectionCaption}" Margin="0,8,0,0" />
+                        <Button Text="Журнал подій" Style="{StaticResource SoftButton}" Command="{Binding ShowLogCommand}" />
+                    </VerticalStackLayout>
+                </ScrollView>
+
+                <Button Grid.Row="2" Text="Вийти з програми" Style="{StaticResource DangerButton}" Command="{Binding ExitCommand}" />
+            </Grid>
+        </Border>
+
+        <!-- ═════════════ Main area ═════════════ -->
+        <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto" RowSpacing="18" Padding="32,26,32,20">
+
+            <!-- Header with the strategy switch -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="20">
+                <VerticalStackLayout Spacing="4" VerticalOptions="Center">
+                    <Label Text="Пошук книг" FontSize="30" FontAttributes="Bold" />
+                    <Label Text="Виберіть значення атрибутів, ключові слова та спосіб аналізу XML."
+                           Style="{StaticResource MutedText}" FontSize="14" />
+                </VerticalStackLayout>
+
+                <!-- Segmented switch SAX | DOM | LINQ to XML (the Strategy pattern, chosen at run time) -->
+                <VerticalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                    <Label Text="СПОСІБ АНАЛІЗУ" Style="{StaticResource SectionCaption}" HorizontalOptions="End" />
+                    <Border BackgroundColor="{StaticResource Surface}"
+                            Stroke="{StaticResource LineBrush}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="4">
+                        <HorizontalStackLayout Spacing="4" BindableLayout.ItemsSource="{Binding Strategies}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:StrategyOptionViewModel">
+                                    <Border Padding="18,7"
+                                            MinimumWidthRequest="104"
+                                            StrokeThickness="0"
+                                            StrokeShape="RoundRectangle 10"
+                                            BackgroundColor="Transparent">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding SelectCommand}" />
+                                        </Border.GestureRecognizers>
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="BackgroundColor" Value="{StaticResource Violet}" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                        <VerticalStackLayout Spacing="0">
+                                            <Label Text="{Binding Name}"
+                                                   FontSize="14"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center"
+                                                   TextColor="{StaticResource TextMuted}">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="TextColor" Value="{StaticResource OnViolet}" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                            <Label Text="{Binding Hint}"
+                                                   FontSize="10"
+                                                   HorizontalOptions="Center"
+                                                   TextColor="{StaticResource TextFaint}">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="TextColor" Value="#33396B" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </HorizontalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Grid>
+
+            <!-- Search form and results scroll together, so nothing is cut off on a small screen -->
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout Spacing="18" Padding="0,0,10,8">
+
+                    <!-- Search parameters -->
+                    <Border Style="{StaticResource Card}">
+                        <VerticalStackLayout Spacing="16">
+                            <Label Text="ПАРАМЕТРИ ПОШУКУ" Style="{StaticResource SectionCaption}" />
+
+                            <Label Text="Відкрийте XML-файл — тут з'являться списки значень його атрибутів."
+                                   Style="{StaticResource MutedText}"
+                                   IsVisible="{Binding HasNoDocument}" />
+
+                            <!-- One tile per attribute of the opened file; a chosen value lights the tile up -->
+                            <FlexLayout Wrap="Wrap"
+                                        Direction="Row"
+                                        JustifyContent="Start"
+                                        AlignItems="Start"
+                                        AlignContent="Start"
+                                        IsVisible="{Binding HasDocument}"
+                                        BindableLayout.ItemsSource="{Binding Filters}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:AttributeFilterViewModel">
+                                        <Border WidthRequest="232"
+                                                Margin="0,0,12,12"
+                                                Padding="14,10,10,6"
+                                                BackgroundColor="{StaticResource SurfaceRaised}"
+                                                Stroke="{StaticResource LineBrush}"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 12">
+                                            <Border.Triggers>
+                                                <DataTrigger TargetType="Border" Binding="{Binding IsActive}" Value="True">
+                                                    <Setter Property="Stroke" Value="{StaticResource AccentBrush}" />
+                                                </DataTrigger>
+                                            </Border.Triggers>
+                                            <VerticalStackLayout Spacing="0">
+                                                <Label Text="{Binding Caption}" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" />
+                                                <Picker ItemsSource="{Binding Options}" SelectedIndex="{Binding SelectedIndex}" />
+                                            </VerticalStackLayout>
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </FlexLayout>
+
+                            <!-- Keywords and the two main buttons -->
+                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                                <Border Grid.Column="0"
+                                        BackgroundColor="{StaticResource SurfaceRaised}"
+                                        Stroke="{StaticResource LineBrush}"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 12"
+                                        Padding="14,0">
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                        <!-- U+E721 is the "search" glyph of the Segoe MDL2 Assets font that ships with Windows -->
+                                        <Label Text="&#xE721;"
+                                               FontFamily="Segoe MDL2 Assets"
+                                               FontSize="14"
+                                               TextColor="{StaticResource TextMuted}"
+                                               VerticalOptions="Center" />
+                                        <Entry Grid.Column="1"
+                                               Text="{Binding Keyword}"
+                                               Placeholder="Ключові слова: назва, автор або анотація"
+                                               ClearButtonVisibility="WhileEditing"
+                                               ReturnCommand="{Binding SearchCommand}"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+                                </Border>
+                                <Button Grid.Column="1" Text="Шукати" WidthRequest="140" Style="{StaticResource PrimaryButton}" Command="{Binding SearchCommand}" />
+                                <Button Grid.Column="2" Text="Очистити" Style="{StaticResource GhostButton}" Command="{Binding ClearCommand}" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Results header with the actions on the found fragment -->
+                    <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12">
+                        <Label Grid.Column="0" Text="Результати" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Border Grid.Column="1" Style="{StaticResource Badge}" BackgroundColor="{StaticResource AccentSoft}" IsVisible="{Binding HasResults}">
+                            <Label Text="{Binding ResultsCountText}" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource Accent}" />
+                        </Border>
+                        <HorizontalStackLayout Grid.Column="3" Spacing="8">
+                            <Button Text="Перегляд HTML" Style="{StaticResource GhostButton}" Command="{Binding ShowHtmlCommand}" />
+                            <Button Text="XML у Drive" Style="{StaticResource SoftButton}" Command="{Binding SaveXmlCommand}" />
+                            <Button Text="HTML у Drive" Style="{StaticResource SoftButton}" Command="{Binding SaveHtmlCommand}" />
+                        </HorizontalStackLayout>
+                    </Grid>
+
+                    <!-- The hint shown instead of the results -->
+                    <Border Style="{StaticResource Card}" Padding="28,40" IsVisible="{Binding IsEmptyStateVisible}">
+                        <VerticalStackLayout Spacing="10" HorizontalOptions="Center" MaximumWidthRequest="520">
+                            <!-- U+E8F1 is the "library" glyph of Segoe MDL2 Assets -->
+                            <Label Text="&#xE8F1;"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   FontSize="38"
+                                   TextColor="{StaticResource Accent}"
+                                   HorizontalOptions="Center" />
+                            <Label Text="{Binding EmptyStateTitle}" FontSize="18" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                            <Label Text="{Binding EmptyStateText}" Style="{StaticResource MutedText}" FontSize="14" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Result cards -->
+                    <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Results}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:BookItem">
+                                <Border Style="{StaticResource Card}" Padding="20,18">
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="18">
+
+                                        <!-- A small "book cover" with the first letter of the title -->
+                                        <Border WidthRequest="56"
+                                                HeightRequest="76"
+                                                VerticalOptions="Start"
+                                                StrokeThickness="0"
+                                                StrokeShape="RoundRectangle 4,10,4,10">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                    <GradientStop Color="#2C3554" Offset="0" />
+                                                    <GradientStop Color="#171C2B" Offset="1" />
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                            <Label Text="{Binding Monogram}"
+                                                   FontSize="26"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{StaticResource Accent}"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center" />
+                                        </Border>
+
+                                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                                            <Label Text="{Binding Title}" FontSize="17" FontAttributes="Bold" />
+                                            <Label Text="{Binding Author}" FontSize="13" TextColor="{StaticResource Violet}" />
+                                            <Label Text="{Binding Annotation}"
+                                                   Style="{StaticResource MutedText}"
+                                                   IsVisible="{Binding HasAnnotation}" />
+
+                                            <!-- The attributes of the book as chips -->
+                                            <FlexLayout Wrap="Wrap"
+                                                        Direction="Row"
+                                                        JustifyContent="Start"
+                                                        AlignItems="Start"
+                                                        AlignContent="Start"
+                                                        Margin="0,4,0,0"
+                                                        BindableLayout.ItemsSource="{Binding Tags}">
+                                                <BindableLayout.ItemTemplate>
+                                                    <DataTemplate x:DataType="vm:TagItem">
+                                                        <Border Margin="0,0,6,6"
+                                                                Padding="10,4"
+                                                                BackgroundColor="{StaticResource SurfaceRaised}"
+                                                                StrokeThickness="0"
+                                                                StrokeShape="RoundRectangle 8">
+                                                            <HorizontalStackLayout Spacing="6">
+                                                                <Label Text="{Binding Caption}" FontSize="12" TextColor="{StaticResource TextFaint}" />
+                                                                <Label Text="{Binding Value}" FontSize="12" />
+                                                            </HorizontalStackLayout>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </BindableLayout.ItemTemplate>
+                                            </FlexLayout>
+
+                                            <Label Text="{Binding ReadersText}" FontSize="12" TextColor="{StaticResource TextFaint}" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- Status line with a spinner while something runs -->
+            <Border Grid.Row="2"
+                    BackgroundColor="{StaticResource Surface}"
+                    Stroke="{StaticResource LineBrush}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="14,9">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <Grid WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
+                        <BoxView WidthRequest="8" HeightRequest="8" CornerRadius="4" Color="{StaticResource Mint}"
+                                 HorizontalOptions="Center" VerticalOptions="Center">
+                            <BoxView.Triggers>
+                                <DataTrigger TargetType="BoxView" Binding="{Binding IsBusy}" Value="True">
+                                    <Setter Property="IsVisible" Value="False" />
+                                </DataTrigger>
+                            </BoxView.Triggers>
+                        </BoxView>
+                        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                           IsVisible="{Binding IsBusy}"
+                                           Color="{StaticResource Accent}"
+                                           WidthRequest="18"
+                                           HeightRequest="18" />
+                    </Grid>
+                    <Label Grid.Column="1"
+                           Text="{Binding Status}"
+                           Style="{StaticResource MutedText}"
+                           VerticalOptions="Center"
+                           LineBreakMode="TailTruncation" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ═════════════ Overlay: Google Drive file list (filled from the code-behind) ═════════════ -->
+        <Grid x:Name="DriveOverlay"
+              Grid.ColumnSpan="2"
+              IsVisible="False"
+              BackgroundColor="{StaticResource Backdrop}"
+              Padding="40">
+            <Border Style="{StaticResource Card}"
+                    WidthRequest="580"
+                    HeightRequest="560"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center">
+                <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
+                    <Label x:Name="DriveOverlayTitle" Grid.Row="0" FontSize="20" FontAttributes="Bold" />
+                    <Label Grid.Row="1" Text="Натисніть на файл, щоб відкрити його." Style="{StaticResource MutedText}" />
+                    <CollectionView x:Name="DriveFilesView"
+                                    Grid.Row="2"
+                                    SelectionMode="Single"
+                                    SelectionChanged="OnDriveFileSelected">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ChoiceItem">
+                                <Border Margin="0,0,0,6"
+                                        Padding="14,10"
+                                        BackgroundColor="{StaticResource SurfaceRaised}"
+                                        StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 10">
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="{Binding Title}" FontAttributes="Bold" LineBreakMode="MiddleTruncation" />
+                                        <Label Text="{Binding Subtitle}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Button Grid.Row="3" Text="Скасувати" Style="{StaticResource GhostButton}" HorizontalOptions="End" Clicked="OnDriveCancelClicked" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ═════════════ Overlay: HTML preview ═════════════ -->
+        <Grid Grid.ColumnSpan="2"
+              IsVisible="{Binding IsPreviewVisible}"
+              BackgroundColor="{StaticResource Backdrop}"
+              Padding="44,32">
+            <Border Style="{StaticResource Card}" Padding="0">
+                <Grid RowDefinitions="Auto,*">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Padding="22,16">
+                        <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                            <Label Text="Перегляд HTML" FontSize="20" FontAttributes="Bold" />
+                            <Label Text="{Binding PreviewTitle}" Style="{StaticResource MutedText}" FontSize="12" LineBreakMode="TailTruncation" />
+                        </VerticalStackLayout>
+                        <Button Grid.Column="1" Text="Відкрити в браузері" Style="{StaticResource SoftButton}" Command="{Binding OpenPreviewInBrowserCommand}" />
+                        <Button Grid.Column="2" Text="Закрити" Style="{StaticResource GhostButton}" Command="{Binding ClosePreviewCommand}" />
+                    </Grid>
+                    <!-- The page is put into the WebView from the code-behind when PreviewHtml changes -->
+                    <WebView x:Name="PreviewWebView" Grid.Row="1" Margin="1,0,1,1" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ═════════════ Overlay: event log ═════════════ -->
+        <Grid Grid.ColumnSpan="2"
+              IsVisible="{Binding IsLogVisible}"
+              BackgroundColor="{StaticResource Backdrop}"
+              Padding="44,32">
+            <Border Style="{StaticResource Card}" MaximumWidthRequest="1000">
+                <Grid RowDefinitions="Auto,*" RowSpacing="16">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="Журнал подій" FontSize="20" FontAttributes="Bold" />
+                            <Label Text="{Binding LogPath}" Style="{StaticResource MutedText}" FontSize="12" LineBreakMode="MiddleTruncation" />
+                        </VerticalStackLayout>
+                        <Button Grid.Column="1" Text="Закрити" Style="{StaticResource GhostButton}" Command="{Binding CloseLogCommand}" VerticalOptions="Start" />
+                    </Grid>
+
+                    <Label Grid.Row="1"
+                           Text="Журнал поки порожній: тут з'являться пошуки, перетворення та збереження."
+                           Style="{StaticResource MutedText}"
+                           IsVisible="{Binding HasNoLogLines}" />
+
+                    <CollectionView Grid.Row="1" ItemsSource="{Binding LogLines}" IsVisible="{Binding HasLogLines}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:LogLineItem">
+                                <Grid ColumnDefinitions="150,Auto,*" ColumnSpacing="12" Padding="0,7">
+                                    <Label Grid.Column="0" Text="{Binding Time}" FontFamily="Consolas" FontSize="12" TextColor="{StaticResource TextFaint}" VerticalOptions="Center" />
+                                    <Border Grid.Column="1"
+                                            Style="{StaticResource Badge}"
+                                            WidthRequest="118"
+                                            BackgroundColor="{StaticResource SurfaceRaised}"
+                                            IsVisible="{Binding HasLevel}">
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding Kind}" Value="filter">
+                                                <Setter Property="BackgroundColor" Value="{StaticResource VioletSoft}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Border" Binding="{Binding Kind}" Value="transform">
+                                                <Setter Property="BackgroundColor" Value="{StaticResource AccentSoft}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Border" Binding="{Binding Kind}" Value="save">
+                                                <Setter Property="BackgroundColor" Value="{StaticResource MintSoft}" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                        <Label Text="{Binding Level}" FontSize="11" FontAttributes="Bold" HorizontalOptions="Center" />
+                                    </Border>
+                                    <Label Grid.Column="2" Text="{Binding Message}" FontSize="13" VerticalOptions="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>
